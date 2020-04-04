@@ -10,15 +10,16 @@ import SwiftUI
 import Combine
 
 
-// you need a Dark Sky API key to download weather. It's free, no credit card required, for less than 1,000 API calls per day. Sign up here:
-// https://darksky.net/dev/register
+// you need a Dark Sky API key to download weather.
+// Apple just bought Dark Sky and aren't issuing new API keys.
+// Sigh. The weather APIs just keep going away.
 
 // overview of Dark Sky API
 // https://darksky.net/dev/docs
 
 
 
-let darkskyApiKey = "Your Dark Sky API key goes here"      // "Your Dark Sky API key goes here"
+let darkskyApiKey = "<Your Dark Sky API key goes here>"      // "<Your Dark Sky API key goes here>"
 let myLatLong = "37.3894,-122.0832"         // lat / long for good old Mountain View
 let darkSkyURL = "https://api.darksky.net/forecast/\(darkskyApiKey)/\(myLatLong)?exclude=minutely,hourly,alerts,flags"
 

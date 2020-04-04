@@ -55,11 +55,10 @@ extension WeatherData  {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         current = try values.decode(CurrentWeather.self, forKey: .currently)
 
-        // dig daily weather info "data" array from inside "hourly"
+        // dig daily weather info "data" array from inside "daily"
         let dailyInfo = try values.nestedContainer(keyedBy: DailyCodingKeys.self, forKey: .daily)
         daily = try dailyInfo.decode([DailyWeather].self, forKey: .data)
     }
-
 }
 
 
