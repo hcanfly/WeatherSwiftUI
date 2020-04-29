@@ -41,6 +41,11 @@ struct ContentView: View {
                     .frame(width: self.screenWidth, height: self.screenHeight)
                     .blur(radius: self.calcBlurRadius())
                 // 11 Pro Max Geometry says we are getting bounds wider than the screen. Looks like this comes from presence of background image
+                HStack(alignment: .center) {
+                    Text(cityName)
+                        .font(.title)
+                        .foregroundColor(.white)
+                }.offset(y: 40)
                 OffsetScrollView(.vertical, showsIndicators: false, offset: self.$scrollViewOffset) {
                         VStack(alignment: .center, spacing: 90) {
                             CurrentWeatherView(viewModel: self.viewModel)

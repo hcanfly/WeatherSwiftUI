@@ -35,13 +35,20 @@ struct DailyWeather : Decodable {
     let temperatureLow: Double?
 }
 
+struct HourlyWeather : Decodable {
+    let summary: String?
+    let icon: String?
+}
+
 struct WeatherData : Decodable {
     let current: CurrentWeather
     let daily:  [DailyWeather]
+    let hourly: HourlyWeather
 
     enum CodingKeys: String, CodingKey {
         case currently
         case daily
+        case hourly
     }
 
     enum DailyCodingKeys: String, CodingKey {
@@ -54,6 +61,7 @@ extension WeatherData  {
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         current = try values.decode(CurrentWeather.self, forKey: .currently)
+        hourly = try values.decode(HourlyWeather.self, forKey: .hourly)
 
         // dig daily weather info "data" array from inside "daily"
         let dailyInfo = try values.nestedContainer(keyedBy: DailyCodingKeys.self, forKey: .daily)

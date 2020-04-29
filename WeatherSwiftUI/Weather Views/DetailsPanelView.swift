@@ -20,7 +20,7 @@ struct DetailsPanelView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Group {
+            VStack {
                 PanelHeaderView(title: "Details")
                 HStack {
                     Image(systemName: viewModel.iconName)
@@ -51,7 +51,7 @@ struct DetailsPanelView: View {
                             Text("Visibility")
                                 .font(.custom(panelViewFontName, size: panelViewFontSize))
                             Spacer()
-                            Text("10 mi.")
+                            Text(viewModel.visibility + " mi.")
                                 .font(.custom(panelViewFontName, size: panelViewFontSize))
                         }
                         Divider()
@@ -64,9 +64,14 @@ struct DetailsPanelView: View {
                                 .foregroundColor(viewModel.uvIndexColor)
                         }.padding(.bottom, 0)
                     }.padding(.trailing, 24)
-                        .padding(.bottom, 10)
                 }
-            }.foregroundColor(.white)
+                Divider()
+                HStack(alignment: .top) {
+                    Text(viewModel.hourlySummary)
+                        .font(.custom(panelViewFontName, size: panelViewFontSize))
+                }
+                Spacer()
+}.foregroundColor(.white)
         }.background(panelBackgroundColor)
     }
 }

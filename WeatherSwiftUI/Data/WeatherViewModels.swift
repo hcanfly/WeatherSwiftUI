@@ -21,20 +21,23 @@ import Combine
 
 let darkskyApiKey = "<Your Dark Sky API key goes here>"      // "<Your Dark Sky API key goes here>"
 let myLatLong = "37.3894,-122.0832"         // lat / long for good old Mountain View
-let darkSkyURL = "https://api.darksky.net/forecast/\(darkskyApiKey)/\(myLatLong)?exclude=minutely,hourly,alerts,flags"
+let cityName = "Mountain View"
+let darkSkyURL = "https://api.darksky.net/forecast/\(darkskyApiKey)/\(myLatLong)?exclude=minutely,alerts,flags"
 
 
 
 final class WeatherDataViewModel: ObservableObject {
     @Published var current: CurrentWeather
     @Published var daily: [DailyWeatherViewModel] = []
+    @Published var hourly: HourlyWeather
 
     private var disposables = Set<AnyCancellable>()
     private let weatherFetcher = DataFetcher()
 
     init() {
         // need to initialize to nil because views will be displayed before data arrives
-        current = CurrentWeather(time: 0, summary: nil, icon: nil, temperature: nil, apparentTemperature: nil, dewPoint: nil, humidity: nil, pressure: nil, windSpeed: 0.0, windBearing: nil, cloudCover: nil, uvIndex: nil, visibility: nil)
+        current = CurrentWeather(time: 0, summary: nil, icon: nil, temperature: nil, apparentTemperature: nil, dewPoint: nil, humidity: nil, pressure: nil, windSpeed: 6.0, windBearing: nil, cloudCover: nil, uvIndex: nil, visibility: nil)
+        hourly = HourlyWeather(summary: nil, icon: nil)
     }
 
     var summary: String {
@@ -106,6 +109,10 @@ final class WeatherDataViewModel: ObservableObject {
         return millibarsToInches(mbars: current.pressure)
     }
 
+    var hourlySummary: String {
+        return hourly.summary ?? ""
+    }
+
 }
 
 extension WeatherDataViewModel {
@@ -123,6 +130,7 @@ extension WeatherDataViewModel {
             }, receiveValue: { someValue in
                 // store weather data in our models
                 self.current = someValue.current
+                self.hourly = someValue.hourly
                 self.daily = someValue.daily.map {
                     DailyWeatherViewModel(m: $0)
                 }
