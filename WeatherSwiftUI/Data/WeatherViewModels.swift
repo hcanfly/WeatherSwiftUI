@@ -280,5 +280,6 @@ struct DailyWeatherViewModel {
             return ""
         }
 
-        return "\((Int(round(dbl))))"
+        return "\(Int(dbl.rounded()))"
     }
+
