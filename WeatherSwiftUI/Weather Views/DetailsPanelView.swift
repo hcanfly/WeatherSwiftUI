@@ -12,18 +12,15 @@ let panelViewFontSize: CGFloat = 16
 let panelBackgroundColor = Color(UIColor(hex: 0x000049, alpha: 0.1))
 
 struct DetailsPanelView: View {
-    @ObservedObject var viewModel: WeatherDataViewModel
+    @ObservedObject var viewModel: ViewModel
 
-    init(viewModel: WeatherDataViewModel) {
-      self.viewModel = viewModel
-    }
 
     var body: some View {
         VStack(alignment: .leading) {
             VStack {
                 PanelHeaderView(title: "Details")
                 HStack {
-                    Image(systemName: viewModel.iconName)
+                    Image(viewModel.weatherIconName)
                         .font(.system(size: 60.0))
                         .padding(.leading, 70)
                         .padding(.trailing, 80)
@@ -33,31 +30,31 @@ struct DetailsPanelView: View {
                     VStack(spacing: 4) {
                         HStack {
                             Text("Feels like")
-                                .font(.custom(panelViewFontName, size: panelViewFontSize))
+                                .scaledPanelFont()
                             Spacer()
-                            Text(viewModel.feelsLike + degreesChar)
-                                .font(.custom(panelViewFontName, size: panelViewFontSize))
+                            Text(viewModel.feelsLike)
+                                .scaledPanelFont()
                         }
                         Divider()
                         HStack {
                             Text("Humidity")
-                                .font(.custom(panelViewFontName, size: panelViewFontSize))
+                                .scaledPanelFont()
                             Spacer()
-                            Text(viewModel.feelsLike + "%")
-                                .font(.custom(panelViewFontName, size: panelViewFontSize))
+                            Text(viewModel.humidity)
+                                .scaledPanelFont()
                         }
                         Divider()
                         HStack {
                             Text("Visibility")
-                                .font(.custom(panelViewFontName, size: panelViewFontSize))
+                                .scaledPanelFont()
                             Spacer()
-                            Text(viewModel.visibility + " mi.")
-                                .font(.custom(panelViewFontName, size: panelViewFontSize))
+                            Text(viewModel.visibility)
+                                .scaledPanelFont()
                         }
                         Divider()
                         HStack {
                             Text("UV Index")
-                                .font(.custom(panelViewFontName, size: panelViewFontSize))
+                                .scaledPanelFont()
                             Spacer()
                             RoundedRectangle(cornerRadius: 8, style: .circular)
                                 .frame(width: 30, height: 10)
@@ -65,13 +62,8 @@ struct DetailsPanelView: View {
                         }.padding(.bottom, 0)
                     }.padding(.trailing, 24)
                 }
-                Divider()
-                HStack(alignment: .top) {
-                    Text(viewModel.hourlySummary)
-                        .font(.custom(panelViewFontName, size: panelViewFontSize))
-                }
                 Spacer()
-}.foregroundColor(.white)
+            }.foregroundColor(.white)
         }.background(panelBackgroundColor)
     }
 }
@@ -82,12 +74,19 @@ struct PanelHeaderView: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.custom(panelViewFontName, size: 26))
+                .scaledPanelFont(size: 26)
                 .padding(.top, 20)
                 .padding(.leading, 10)
             Spacer()
 
         }.padding(.bottom, 2)
+    }
+}
+
+extension View {
+
+    func scaledPanelFont(size: CGFloat = panelViewFontSize) -> some View {
+        return self.modifier(ScaledFont(name: panelViewFontName, size: size))
     }
 }
 
@@ -103,7 +102,7 @@ extension UIColor {
 
 struct DetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        DetailsPanelView(viewModel: WeatherDataViewModel())
+        DetailsPanelView(viewModel: ViewModel())
             .background(Color.blue)
             .frame(width: 400, height: 120)
     }

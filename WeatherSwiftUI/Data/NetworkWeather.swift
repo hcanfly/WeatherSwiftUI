@@ -25,14 +25,12 @@ enum NetworkError: Error, LocalizedError {
 }
 
 
-final class DataFetcher {
+enum DataFetcher {
 
     // download data and decode from JSON
-    func fetch<T: Decodable>(urlString: String, myType: T.Type) -> AnyPublisher<T, Error> {
-        guard let url = URL(string: urlString) else {
-            let error = NetworkError.apiError(reason: "Couldn't create URL")
-
-        return Fail(error: error).eraseToAnyPublisher()
+    static func fetch<T: Decodable>(url: URL?, myType: T.Type) -> AnyPublisher<T, Error> {
+        guard let url = url else {
+          fatalError("Did you enter your AccuWeather API Key?")
         }
 
         return URLSession.shared.dataTaskPublisher(for: url)

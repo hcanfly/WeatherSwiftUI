@@ -1,11 +1,11 @@
 {
   "images" : [
     {
+      "filename" : "22-s.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "mask_weather_40@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

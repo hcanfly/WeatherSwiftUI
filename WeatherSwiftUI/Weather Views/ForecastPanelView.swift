@@ -10,23 +10,24 @@ import SwiftUI
 
 
 struct ForecastPanelView: View {
-    var dailyWeather: [DailyWeatherViewModel]
+    let forecast: [ForecastInfo]
+
 
     var body: some View {
         Group {
-        if (dailyWeather.count > 0) {
+        if (forecast.count > 0) {
                 VStack(alignment: .leading, spacing: 6) {
                     Group {
                         PanelHeaderView(title: "Forecast")
                             .padding(.bottom, 10)
                         ForEach((0...4), id: \.self) {
-                            ForecastDayView(dailyWeather: self.dailyWeather[$0])
+                            ForecastDayView(dailyWeather: self.forecast[$0])
                         }
                     }
                     .foregroundColor(.white)
                 }
                 .padding(.bottom, 10)
-                .background(Image("PanelBackground").resizable())
+                .background(panelBackgroundColor)
             } else {
                 VStack {
                     Text("No data")
@@ -40,20 +41,20 @@ struct ForecastPanelView: View {
 }
 
 struct ForecastDayView: View {
-    var dailyWeather: DailyWeatherViewModel
+    var dailyWeather:  ForecastInfo
 
     var body: some View {
         HStack {
-            Text(dailyWeather.dayOfWeek)
-                .font(.custom(panelViewFontName, size: panelViewFontSize))
+            Text(dailyWeather.dow)
+                .scaledPanelFont()
                 .frame(width: 110, alignment: .leading)
             Spacer()
-            Image(systemName: dailyWeather.iconName)
+            Image(dailyWeather.icon)
             Spacer()
-            Text(dailyWeather.highTemperature + degreesChar)
-                .font(.custom(panelViewFontName, size: panelViewFontSize))
-            Text(dailyWeather.lowTemperature + degreesChar)
-                .font(.custom(panelViewFontName, size: panelViewFontSize))
+            Text(dailyWeather.max + degreesChar)
+                .scaledPanelFont()
+            Text(dailyWeather.min + degreesChar)
+                .scaledPanelFont()
         }.padding(.leading, 20)
         .padding(.trailing, 20)
     }

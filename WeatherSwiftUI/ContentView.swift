@@ -9,21 +9,17 @@
 import SwiftUI
 
 
-let degreesChar = "°"
-
-
 struct ContentView: View {
-    @ObservedObject var viewModel: WeatherDataViewModel
-
+    @ObservedObject var viewModel: ViewModel
     @State private var scrollViewOffset: CGPoint = .zero
+
     let screenHeight = UIScreen.main.bounds.height
     let screenWidth = UIScreen.main.bounds.width
     let panelWidth = UIScreen.main.bounds.width - 20
     let panelHeight: CGFloat = 120
 
-    init(viewModel: WeatherDataViewModel) {
-      self.viewModel = viewModel
-    }
+    let cityName = "Mountain View"
+
 
     func calcBlurRadius() -> CGFloat {
         // blur the background image more as view is scrolled down
@@ -42,7 +38,7 @@ struct ContentView: View {
                     .blur(radius: self.calcBlurRadius())
                 // 11 Pro Max Geometry says we are getting bounds wider than the screen. Looks like this comes from presence of background image
                 HStack(alignment: .center) {
-                    Text(cityName)
+                    Text(self.cityName)
                         .font(.title)
                         .foregroundColor(.white)
                 }.offset(y: 40)
@@ -52,13 +48,14 @@ struct ContentView: View {
                                 .frame(width: self.panelWidth, height: self.panelHeight)
                             DetailsPanelView(viewModel: self.viewModel)
                                 .frame(width: self.panelWidth, height: self.panelHeight)
-                                .padding(.bottom, 10)
-                            ForecastPanelView(dailyWeather: self.viewModel.daily)
+                                .padding(.bottom, 60)
+                            ForecastPanelView(forecast:self.viewModel.forecastInfo())
                                 .frame(width: self.panelWidth, height: self.panelHeight)
+                            .padding(.bottom, 60)
                             WindAndPressurePanelView(viewModel: self.viewModel)
                                 .frame(width: self.panelWidth, height: self.panelHeight)
                             Spacer()
-                        }.padding(.top, self.screenHeight - 190)
+                        }.padding(.top, self.screenHeight - geometry.safeAreaInsets.bottom - 190)
                     }
                 .frame(width: self.panelWidth)
                     .offset(y: geometry.safeAreaInsets.top + 10)
@@ -78,6 +75,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(viewModel: WeatherDataViewModel())
+        ContentView(viewModel: ViewModel())
     }
 }

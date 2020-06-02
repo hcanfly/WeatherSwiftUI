@@ -10,11 +10,7 @@ import SwiftUI
 
 
 struct WindAndPressurePanelView: View {
-    @ObservedObject var viewModel: WeatherDataViewModel
-
-    init(viewModel: WeatherDataViewModel) {
-      self.viewModel = viewModel
-    }
+    @ObservedObject var viewModel: ViewModel
 
     var bladeAnimation: Animation {
         // duration / repeatForever is seriously broken. this animation will never change even though it gets called with new model values
@@ -57,15 +53,15 @@ struct WindAndPressurePanelView: View {
                         .offset(x: -20)
                     VStack(alignment: .leading) {
                         Text("Wind")
-                         .font(.custom(panelViewFontName, size: panelViewFontSize))
-                        Text(viewModel.windSpeed + " mph " + viewModel.windDirection)
-                         .font(.custom(panelViewFontName, size: panelViewFontSize))
+                         .scaledPanelFont()
+                        Text(viewModel.windInfo)
+                         .scaledPanelFont()
                     }.offset(y: -60)
                     VStack(alignment: .center) {
                         Text("Barometer")
-                         .font(.custom(panelViewFontName, size: panelViewFontSize))
-                        Text(viewModel.barometer + " in")
-                         .font(.custom(panelViewFontName, size: panelViewFontSize))
+                         .scaledPanelFont()
+                        Text(viewModel.pressure)
+                         .scaledPanelFont()
                     }.frame(width: 100)
                     .padding(.leading, 30)
                 }.padding(.top, 20)
@@ -80,7 +76,7 @@ struct WindAndPressureView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
             Color.blue
-            WindAndPressurePanelView(viewModel: WeatherDataViewModel())
+            WindAndPressurePanelView(viewModel: ViewModel())
         }
         .frame(width: 400, height: 120)
     }

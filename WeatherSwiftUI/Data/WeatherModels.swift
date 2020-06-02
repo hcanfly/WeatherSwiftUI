@@ -8,96 +8,65 @@
 
 import SwiftUI
 
-
-struct CurrentWeather : Decodable {
-    let time: Int
-    let summary: String?
-    let icon: String?
-    let temperature: Double?
-    let apparentTemperature: Double?
-    let dewPoint: Double?
-    let humidity: Double?
-    let pressure: Double?
-    let windSpeed: Double?
-    let windBearing: Int?
-    let cloudCover: Double?
-    let uvIndex: Int?
-    let visibility: Double?     // 10 is max. Int?
+struct AccuValue : Decodable {
+    let Value: Double
+    let Unit: String
 }
 
-struct DailyWeather : Decodable {
-    let time: Int
-    let summary: String?
-    let icon: String?
-    let sunriseTime: Int?
-    let sunsetTime: Int?
-    let temperatureHigh: Double?
-    let temperatureLow: Double?
+struct ImperialInfo : Decodable {
+    let Imperial: AccuValue           // also has Metric
 }
 
-struct HourlyWeather : Decodable {
-    let summary: String?
-    let icon: String?
+struct DirectionDetail : Decodable {
+    let Degrees: Int
+    let Localized: String
 }
 
-struct WeatherData : Decodable {
-    let current: CurrentWeather
-    let daily:  [DailyWeather]
-    let hourly: HourlyWeather
-
-    enum CodingKeys: String, CodingKey {
-        case currently
-        case daily
-        case hourly
-    }
-
-    enum DailyCodingKeys: String, CodingKey {
-        case data
-    }
+struct WindSpeed : Decodable {
+    let Imperial: AccuValue
 }
 
-extension WeatherData  {
+struct WindInfo : Decodable {
+    let Direction: DirectionDetail
+    let Speed: ImperialInfo
+}
 
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        current = try values.decode(CurrentWeather.self, forKey: .currently)
-        hourly = try values.decode(HourlyWeather.self, forKey: .hourly)
-
-        // dig daily weather info "data" array from inside "daily"
-        let dailyInfo = try values.nestedContainer(keyedBy: DailyCodingKeys.self, forKey: .daily)
-        daily = try dailyInfo.decode([DailyWeather].self, forKey: .data)
-    }
+struct CurrentData : Decodable {
+    let LocalObservationDateTime: String
+    let EpochTime: Int
+    let WeatherText: String
+    let WeatherIcon: Int
+    let PrecipitationType: String?          // check for "Rain" if not nil
+    let IsDayTime: Bool
+    let Temperature: ImperialInfo
+    let RealFeelTemperature: ImperialInfo   // "Patented AccuWeather RealFeel Temperature"
+    let RelativeHumidity: Int?
+    let Wind: WindInfo
+    let UVIndex: Int?
+    let Visibility: ImperialInfo
+    let Pressure: ImperialInfo
+    let ApparentTemperature: ImperialInfo
+    let WindChillTemperature: ImperialInfo
 }
 
 
-/*
- // values not used not shown
- "currently": {
-     "time": 1581977303,
-     "summary": "Clear",
-     "icon": "clear-day",
-     "temperature": 69.81,
-     "apparentTemperature": 69.81,
-     "humidity": 0.21,
-     "pressure": 1017.7,
-     "windSpeed": 8.24,
-     "windBearing": 339,
-     "cloudCover": 0.1,
-     "uvIndex": 3,
-     "visibility": 10,
- },
- "daily": {
-     "summary": "No precipitation throughout the week.",
-     "icon": "clear-day",
-     "data": [
-         {
-         "time": 1581926400,
-         "summary": "Clear throughout the day.",
-         "icon": "clear-day",
-         "sunriseTime": 1581951420,
-         "sunsetTime": 1581990660,
-         "temperatureHigh": 70.39,
-         "temperatureLow": 42.67,
-         }
-    ]
- */
+struct ForecastTemperatureInfo : Decodable {
+    let Minimum: AccuValue
+    let Maximum: AccuValue
+}
+
+struct ConditionsInfo : Decodable {
+    let Icon: Int
+    let IconPhrase: String
+}
+
+struct DailyData : Decodable {
+    let Date: String
+    let EpochDate: Int
+    let Temperature: ForecastTemperatureInfo
+    let Day: ConditionsInfo
+}
+
+struct ForecastData : Decodable {
+    let DailyForecasts : [DailyData]
+}
