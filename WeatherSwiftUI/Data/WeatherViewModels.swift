@@ -109,7 +109,7 @@ final class ViewModel: ObservableObject {
     }
 
     var bladeDuration: Double {
-        var speed = 0.0       // this is actually rotation duration - less is faster (well, if > 0)
+        var speed = 80.0       // this is actually rotation duration - less is faster (well, if > 0)
         let windSpeed = self.windSpeed
 
         if windSpeed > 11 {
@@ -129,8 +129,9 @@ final class ViewModel: ObservableObject {
         return self.current.Wind.Direction.Localized
     }
 
-    var windInfo: String {
-        return self.windSpeedString + " mph " + self.windDirection
+    var windSpeedInfo: String {
+        let info = self.windSpeedString + " mph " + self.windDirection
+        return info
     }
 
     var pressure: String {
@@ -256,8 +257,12 @@ fileprivate func getWindDirection(degrees: Double?) -> String {
 }
 
 fileprivate func doubleToRoundedString(dbl: Double?) -> String {
-    guard let dbl = dbl, dbl != 0.0 else {
+    guard let dbl = dbl else {
         return ""
+    }
+
+    guard dbl != 0.0 else {
+        return "0"
     }
 
     return "\(Int(dbl.rounded()))"

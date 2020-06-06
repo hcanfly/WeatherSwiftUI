@@ -12,11 +12,11 @@ import SwiftUI
 struct WindAndPressurePanelView: View {
     @ObservedObject var viewModel: ViewModel
 
-    var bladeAnimation: Animation {
+    var bladeAnimation: Animation? {
         // duration / repeatForever is seriously broken. this animation will never change even though it gets called with new model values
         // so, this should work because it gets called when model changes - but it doesn't work
         // I'm not the first to find this bug.
-        return Animation.linear(duration: viewModel.bladeDuration).repeatForever(autoreverses: false)
+        return viewModel.bladeDuration < 80 ? Animation.linear(duration: viewModel.bladeDuration).repeatForever(autoreverses: false) : nil
     }
 
     @State private var rotateLargeFan = true
@@ -54,7 +54,7 @@ struct WindAndPressurePanelView: View {
                     VStack(alignment: .leading) {
                         Text("Wind")
                          .scaledPanelFont()
-                        Text(viewModel.windInfo)
+                        Text(viewModel.windSpeedInfo)
                          .scaledPanelFont()
                     }.offset(y: -60)
                     VStack(alignment: .center) {

@@ -18,7 +18,7 @@ import Combine
 
 
 let locationCode = "337169"         // Mountain View, CA
-let accuWeatherapikey = "YQAGA3sYLNyKBajv63vHNAPHyO3EZGJK"  // <your AccuWeather api key>
+let accuWeatherapikey = "<your AccuWeather api key>"  // <your AccuWeather api key>
 
 extension URL {
 
@@ -63,7 +63,9 @@ extension ViewModel {
         let _ = Publishers.Zip(currentWeatherPublisher, forecastWeatherPublisher)
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { current, forecast in
-                self.current = current[0]
+                if current.count > 0 {
+                    self.current = current[0]
+                }
                 self.forecast = forecast
             })
             .store(in: &disposables)
