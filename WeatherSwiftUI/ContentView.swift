@@ -55,7 +55,7 @@ struct ContentView: View {
                         WindAndPressurePanelView(viewModel: self.viewModel)
                             .frame(width: self.panelWidth, height: self.panelHeight)
                         Spacer()
-                    }.padding(.top, self.screenHeight - geometry.safeAreaInsets.bottom - 140)
+                    }.padding(.top, self.screenHeight - geometry.safeAreaInsets.bottom - 230)
                 }
                 .frame(width: self.panelWidth)
                 .offset(y: geometry.safeAreaInsets.top + 54)
