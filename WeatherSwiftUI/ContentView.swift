@@ -43,23 +43,23 @@ struct ContentView: View {
                         .foregroundColor(.white)
                 }.offset(y: 40)
                 OffsetScrollView(.vertical, showsIndicators: false, offset: self.$scrollViewOffset) {
-                        VStack(alignment: .center, spacing: 90) {
-                            CurrentWeatherView(viewModel: self.viewModel)
-                                .frame(width: self.panelWidth, height: self.panelHeight)
-                            DetailsPanelView(viewModel: self.viewModel)
-                                .frame(width: self.panelWidth, height: self.panelHeight)
-                                .padding(.bottom, 60)
-                            ForecastPanelView(forecast:self.viewModel.forecastInfo())
-                                .frame(width: self.panelWidth, height: self.panelHeight)
+                    VStack(alignment: .center, spacing: 90) {
+                        CurrentWeatherView(viewModel: self.viewModel)
+                            .frame(width: self.panelWidth, height: self.panelHeight)
+                        DetailsPanelView(viewModel: self.viewModel)
+                            .frame(width: self.panelWidth, height: self.panelHeight)
                             .padding(.bottom, 60)
-                            WindAndPressurePanelView(viewModel: self.viewModel)
-                                .frame(width: self.panelWidth, height: self.panelHeight)
-                            Spacer()
-                        }.padding(.top, self.screenHeight - geometry.safeAreaInsets.bottom - 190)
-                    }
-                .frame(width: self.panelWidth)
-                    .offset(y: geometry.safeAreaInsets.top + 10)
+                        ForecastPanelView(forecast:self.viewModel.forecastInfo())
+                            .frame(width: self.panelWidth, height: self.panelHeight)
+                            .padding(.bottom, 60)
+                        WindAndPressurePanelView(viewModel: self.viewModel)
+                            .frame(width: self.panelWidth, height: self.panelHeight)
+                        Spacer()
+                    }.padding(.top, self.screenHeight - geometry.safeAreaInsets.bottom - 140)
                 }
+                .frame(width: self.panelWidth)
+                .offset(y: geometry.safeAreaInsets.top + 54)
+            }
         }
         .edgesIgnoringSafeArea(.all)
         .onAppear {
