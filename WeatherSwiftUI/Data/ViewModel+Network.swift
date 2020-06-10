@@ -36,33 +36,20 @@ extension ViewModel {
 
     func getWeather() {
 
-        let currentWeatherPublisher = URLSession.shared.dataTaskPublisher(for: URL.weather!)
-            .tryMap { data, response -> Data in
-                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                    throw NetworkError.unknown
-                }
-                //print(String(bytes: data, encoding: String.Encoding.utf8))
-                return data
-        }
-        .decode(type: [CurrentData].self, decoder: JSONDecoder())
-        .replaceError(with: [])
-        .eraseToAnyPublisher()
+        let currentWeatherPublisher = DataFetcher.fetch(url: URL.weather, myType: [CurrentData].self)
+        let forecastWeatherPublisher = DataFetcher.fetch(url: URL.forecastWeather, myType: ForecastData.self)
 
-        let forecastWeatherPublisher = URLSession.shared.dataTaskPublisher(for: URL.forecastWeather!)
-            .tryMap { data, response -> Data in
-                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                    throw NetworkError.unknown
-                }
-                //print(String(bytes: data, encoding: String.Encoding.utf8))
-                return data
-        }
-        .decode(type: ForecastData.self, decoder: JSONDecoder())
-        .replaceError(with: self.forecast)      // yes, hack. but shouldn't happen. not recommended for real app.
-        .eraseToAnyPublisher()
-
+        // wait until both fetches finish before updating the data and forcing the UI to refresh
         let _ = Publishers.Zip(currentWeatherPublisher, forecastWeatherPublisher)
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { current, forecast in
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let theError):
+                    self.handleDownloadError(error: theError)
+                }
+            }, receiveValue: { (current, forecast) in
                 if current.count > 0 {
                     self.current = current[0]
                 }
@@ -70,6 +57,21 @@ extension ViewModel {
             })
             .store(in: &disposables)
     }
+
+    // in real life you might want a bit more than this...
+    func handleDownloadError(error: NetworkError) {
+        switch error {
+        case NetworkError.invalidHTTPResponse:
+            //print(error.errorDescription)
+            break
+        case NetworkError.invalidServerResponse:
+            //print(error.errorDescription)
+            break
+        case NetworkError.jsonParsingError:
+            //print(error.errorDescription)
+            break
+        default:
+            break
+        }
+    }
 }
-
-
