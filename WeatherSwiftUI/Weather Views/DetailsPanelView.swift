@@ -13,12 +13,14 @@ let panelBackgroundColor = Color(UIColor(hex: 0x000049, alpha: 0.1))
 
 struct DetailsPanelView: View {
     @ObservedObject var viewModel: ViewModel
+    let screenWidth = UIScreen.main.bounds.width
 
 
     var body: some View {
         VStack(alignment: .leading) {
             VStack {
                 PanelHeaderView(title: "Details")
+                    .padding(.leading, screenWidth > 500 ? 0 : 14)
                 HStack {
                     Image(viewModel.weatherIconName)
                         .font(.system(size: 60.0))
@@ -27,10 +29,11 @@ struct DetailsPanelView: View {
                         .padding(.bottom, 20)
                     Spacer()
                     Divider()
-                    VStack(spacing: 4) {
+                    VStack(alignment: .trailing, spacing: 4) {
                         HStack {
                             Text("Feels like")
                                 .scaledPanelFont()
+                                .alignmentGuide(HorizontalAlignment.center, computeValue: { _ in -190 } )
                             Spacer()
                             Text(viewModel.feelsLike)
                                 .scaledPanelFont()
@@ -60,7 +63,8 @@ struct DetailsPanelView: View {
                                 .frame(width: 30, height: 10)
                                 .foregroundColor(viewModel.uvIndexColor)
                         }.padding(.bottom, 0)
-                    }.padding(.trailing, 24)
+                    }.padding(.trailing, screenWidth > 500 ? 20 : 36)
+                    .frame(width: 180)
                 }
                 Spacer()
             }.foregroundColor(.white)
