@@ -11,4 +11,4 @@ WeatherSwiftUI is an iOS weather app whose UI is similar to parts of the Yahoo! 
 
 ## License
 
-WeatherSwiftUI is licensed under the MIT License. See the LICENSE file for more information, but basically this is sample code and you can do whatever you want with it.
+WeatherSwiftUI  is licensed under the Unlicense. See the LICENSE file for more information, but basically this is sample code and you can do whatever you want with it.

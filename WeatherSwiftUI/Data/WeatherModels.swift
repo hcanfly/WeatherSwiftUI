@@ -28,7 +28,7 @@ struct WindSpeed : Decodable {
 
 struct WindInfo : Decodable {
     let Direction: DirectionDetail
-    let Speed: ImperialInfo
+    let Speed: ImperialInfo?
 }
 
 struct CurrentData : Decodable {
