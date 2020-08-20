@@ -70,3 +70,16 @@ struct DailyData : Decodable {
 struct ForecastData : Decodable {
     let DailyForecasts : [DailyData]
 }
+
+struct HourlyData : Decodable {
+    let DateTime: String
+    let EpochDateTime: Int
+    let WeatherIcon: Int
+    let IconPhrase: String
+    let IsDaylight: Bool
+    let Temperature: AccuValue
+}
+
+struct HourlyForecastData : Decodable {
+    var hourlyForecasts: [HourlyData]
+}

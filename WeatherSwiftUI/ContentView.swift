@@ -33,7 +33,6 @@ struct ContentView: View {
                     // need frame to constrain geometry bounds on some devices
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .blur(radius: self.calcBlurRadius(height: geometry.size.height))
-                // 11 Pro Max Geometry says we are getting bounds wider than the screen. Looks like this comes from presence of background image
                 HStack(alignment: .center) {
                     Text(self.cityName)
                         .font(.title)
@@ -58,7 +57,7 @@ struct ContentView: View {
                 .offset(y: geometry.safeAreaInsets.top + 54)
             }
         }
-        .edgesIgnoringSafeArea(.all)
+        .edgesIgnoringSafeArea(.all)          //TODO: deprecated in Xcode 12. update to ignoresSafeArea() when target changes to iOS 14.
         .onAppear {
             self.viewModel.getWeather()
         }
