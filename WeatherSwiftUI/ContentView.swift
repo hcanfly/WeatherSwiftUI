@@ -12,6 +12,7 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var viewModel: ViewModel
     @State private var scrollViewOffset: CGPoint = .zero
+    @Environment(\.scenePhase) var scenePhase
 
     let panelHeight: CGFloat = 120
 
@@ -57,12 +58,18 @@ struct ContentView: View {
                 .offset(y: geometry.safeAreaInsets.top + 54)
             }
         }
-        .edgesIgnoringSafeArea(.all)          //TODO: deprecated in Xcode 12. update to ignoresSafeArea() when target changes to iOS 14.
+        //.edgesIgnoringSafeArea(.all)          //TODO: deprecated in Xcode 12.
+        .ignoresSafeArea(.all)
         .onAppear {
             self.viewModel.getWeather()
         }
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            self.viewModel.getWeather()
+//        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+//            self.viewModel.getWeather()
+//        }
+        .onChange(of: scenePhase) { phase in      // iOS 14 replacement for notification
+            if phase == .active {
+              self.viewModel.getWeather()
+            }
         }
     }
 }
