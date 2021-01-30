@@ -12,11 +12,10 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var viewModel: ViewModel
     @State private var scrollViewOffset: CGPoint = .zero
-    @Environment(\.scenePhase) var scenePhase
+    //@Environment(\.scenePhase) var scenePhase
 
-    let panelHeight: CGFloat = 120
-
-    let cityName = "Mountain View"
+    private let panelHeight: CGFloat = 120
+    private let cityName = "Mountain View"
 
 
     func calcBlurRadius(height: CGFloat) -> CGFloat {
@@ -58,19 +57,19 @@ struct ContentView: View {
                 .offset(y: geometry.safeAreaInsets.top + 54)
             }
         }
-        //.edgesIgnoringSafeArea(.all)          //TODO: deprecated in Xcode 12.
-        .ignoresSafeArea(.all)
+        .ignoresSafeArea()
         .onAppear {
             self.viewModel.getWeather()
         }
-//        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-//            self.viewModel.getWeather()
-//        }
-        .onChange(of: scenePhase) { phase in      // iOS 14 replacement for notification
-            if phase == .active {
-              self.viewModel.getWeather()
-            }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            self.viewModel.getWeather()
         }
+        // this isn't working. it should work. did for a while
+//        .onChange(of: scenePhase) { phase in
+//            if phase == .active {
+//              self.viewModel.getWeather()
+//            }
+//        }
     }
 }
 
@@ -81,3 +80,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView(viewModel: ViewModel())
     }
 }
+

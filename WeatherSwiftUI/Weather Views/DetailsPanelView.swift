@@ -13,7 +13,7 @@ let panelBackgroundColor = Color(UIColor(hex: 0x000049, alpha: 0.1))
 
 struct DetailsPanelView: View {
     @ObservedObject var viewModel: ViewModel
-    let screenWidth = UIScreen.main.bounds.width
+    private let screenWidth = UIScreen.main.bounds.width
 
 
     var body: some View {

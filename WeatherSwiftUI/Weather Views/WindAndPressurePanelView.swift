@@ -12,7 +12,7 @@ import SwiftUI
 struct WindAndPressurePanelView: View {
     @ObservedObject var viewModel: ViewModel
 
-    var bladeAnimation: Animation? {
+    private var bladeAnimation: Animation? {
         // duration / repeatForever is seriously broken. this animation will never change even though it gets called with new model values
         // so, this should work because it gets called when model changes - but it doesn't work
         // and setting the duration to a default number instead of returning nil animation was tried first. didn't work either.
@@ -21,7 +21,9 @@ struct WindAndPressurePanelView: View {
         //print(viewModel.bladeDuration)
         //return viewModel.bladeDuration != nil ? Animation.linear(duration: viewModel.bladeDuration!).repeatForever(autoreverses: false) : nil
         // use a default speed to have blade rotate. looks more interesting than not rotating.
-        return Animation.linear(duration: viewModel.bladeDuration ?? 12).repeatForever(autoreverses: false)
+        //print(viewModel.current.Wind.Speed)
+        //return Animation.linear(duration: viewModel.bladeDuration ?? 12).repeatForever(autoreverses: false)
+        return Animation.linear(duration: viewModel.bladeDuration).repeatCount(99999, autoreverses: false)
     }
 
     // Another problem that I believe is related to the above is that when the device is rotated the blades just kind of start floating around
