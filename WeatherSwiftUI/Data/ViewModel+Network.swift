@@ -18,7 +18,7 @@ import Combine
 
 
 let locationCode = "337169"         // Mountain View, CA
-let accuWeatherapikey = "<your AccuWeather api key>"  // <your AccuWeather api key>
+let accuWeatherapikey = "<your AccuWeather api key>"  // MUST CHANGE API KEY!!
 
 extension URL {
 
@@ -38,12 +38,12 @@ extension URL {
 
 extension ViewModel {
 
-    // data for the aop and large widget
     func getWeather() {
-
+        
+        self.state = .loading
         let currentWeatherPublisher = DataFetcher.fetch(url: URL.weather, myType: [CurrentData].self)
         let forecastWeatherPublisher = DataFetcher.fetch(url: URL.forecastWeather, myType: ForecastData.self)
-
+        
         // wait until both fetches finish before updating the data and forcing the UI to refresh
         let _ = Publishers.Zip(currentWeatherPublisher, forecastWeatherPublisher)
             .receive(on: DispatchQueue.main)
@@ -53,15 +53,21 @@ extension ViewModel {
                     break
                 case .failure(let theError):
                     self.handleDownloadError(error: theError)
+                    self.state = .failed(theError)
                 }
             }, receiveValue: { (current, forecast) in
                 if current.count > 0 {
-                    self.current = current.first!
+                    self.weatherData.current = current.first!
+                    self.weatherData.forecast = forecast
+                    self.state = .loaded(self.weatherData)
+                } else {
+                    self.handleDownloadError(error: .invalidServerResponse)
+                    self.state = .failed(.invalidServerResponse)
                 }
-                self.forecast = forecast
-            })
+            }
+            )
             .store(in: &disposables)
-   }
+    }
 
     // in real life you might want a bit more than this...
     func handleDownloadError(error: NetworkError) {
@@ -79,56 +85,5 @@ extension ViewModel {
             break
         }
     }
-
-/*
-     These were used for testing possible downloads for the widget app. Not used, but could possibly be useful sometime
-
-     
-    // weather for small widget
-    func getCurrentWeather() {
-        let currentWeatherPublisher = DataFetcher.fetch(url: URL.weather, myType: [CurrentData].self)
-
-        let _ = currentWeatherPublisher
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    break
-                case .failure(let theError):
-                    self.handleDownloadError(error: theError)
-                }
-            }, receiveValue: { current in
-                if current.count > 0 {
-                    self.current = current.first!
-                }
-
-            })
-            .store(in: &disposables)
-    }
-
-    // medium widget
-    func getHourlyForecastWeather() {
-        let currentWeatherPublisher = DataFetcher.fetch(url: URL.weather, myType: [CurrentData].self)
-        let hourlyForecastWeatherPublisher = DataFetcher.fetch(url: URL.hourlyForecastWeather, myType: [HourlyData].self)
-
-        // wait until both fetches finish before updating the data and forcing the UI to refresh
-        let _ = Publishers.Zip(currentWeatherPublisher, hourlyForecastWeatherPublisher)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    break
-                case .failure(let theError):
-                    self.handleDownloadError(error: theError)
-                }
-            }, receiveValue: { (current, hourlyForecast) in
-                if current.count > 0 {
-                    self.current = current.first!
-                }
-                self.hourlyForecast.hourlyForecasts = hourlyForecast
-            })
-            .store(in: &disposables)
-    }
-*/
 
 }

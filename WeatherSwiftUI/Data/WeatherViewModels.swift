@@ -12,26 +12,10 @@ import Combine
 let degreesChar = "°"
 
 
-final class ViewModel: ObservableObject {
-
-    @Published var current: CurrentData
-    @Published var forecast: ForecastData
-    @Published var hourlyForecast: HourlyForecastData
-    @Published var environment = false
-
-    var disposables = Set<AnyCancellable>()
-
-
-    init() {
-        // dummy data because screen will appear before we have real data. usually very brief.
-        // much better solution is to take the time to create views that can handle case with no data. the forecast panel does a crude version of this.
-        self.current = CurrentData(LocalObservationDateTime: "", EpochTime: 23423434, WeatherText: "Partly Cloudy", WeatherIcon: 7, PrecipitationType: nil, IsDayTime: true, Temperature: ImperialInfo(Imperial: AccuValue(Value: 55, Unit: "F")), RealFeelTemperature: ImperialInfo(Imperial: AccuValue(Value: 60, Unit: "F")), RelativeHumidity: 22, Wind: WindInfo(Direction: DirectionDetail(Degrees: 268, Localized: "NW"), Speed: ImperialInfo(Imperial: AccuValue(Value: 6, Unit: "mi/h"))), UVIndex: 4, Visibility: ImperialInfo(Imperial: AccuValue(Value: 10, Unit: "in")), Pressure: ImperialInfo(Imperial: AccuValue(Value: 29.81, Unit: "inHg")), ApparentTemperature: ImperialInfo(Imperial: AccuValue(Value: 64.0, Unit: "F")), WindChillTemperature: ImperialInfo(Imperial: AccuValue(Value: 55.5, Unit: "F")))
-
-        self.forecast = ForecastData(DailyForecasts: [DailyData(Date: "", EpochDate: 789798, Temperature: ForecastTemperatureInfo(Minimum: AccuValue(Value: 50, Unit: "F"), Maximum: AccuValue(Value: 88, Unit: "F")), Day: ConditionsInfo(Icon: 6, IconPhrase: ""))])
-
-        self.hourlyForecast = HourlyForecastData(hourlyForecasts: [HourlyData(DateTime: "", EpochDateTime: 789798, WeatherIcon: 6, IconPhrase: "", IsDaylight: true, Temperature: AccuValue(Value: 50, Unit: "F"))])
-    }
-
+struct WeatherData {
+    var current: CurrentData!
+    var forecast: ForecastData!
+    
     //MARK: - Current Conditions view
     var temperature: String {
         return doubleToRoundedString(dbl: self.current.Temperature.Imperial.Value)
@@ -166,6 +150,36 @@ final class ViewModel: ObservableObject {
             }
 
         return forecast
+    }
+}
+
+final class ViewModel: ObservableObject {
+    enum State {
+        case idle
+        case loading
+        case failed(NetworkError)
+        case loaded(WeatherData)
+    }
+
+    //@Published private(set) var state = State.idle    // can't do this with getWeather extension in a separate file
+    @Published var state = State.idle
+    
+    var weatherData = WeatherData()
+    var current: CurrentData  { return weatherData.current }
+    var forecast: ForecastData  { return weatherData.forecast }
+
+    var disposables = Set<AnyCancellable>()
+
+
+    
+    init() {
+        let current = CurrentData(LocalObservationDateTime: "", EpochTime: 23423434, WeatherText: "Partly Cloudy", WeatherIcon: 7, PrecipitationType: nil, IsDayTime: true, Temperature: ImperialInfo(Imperial: AccuValue(Value: 55, Unit: "F")), RealFeelTemperature: ImperialInfo(Imperial: AccuValue(Value: 60, Unit: "F")), RelativeHumidity: 22, Wind: WindInfo(Direction: DirectionDetail(Degrees: 268, Localized: "NW"), Speed: ImperialInfo(Imperial: AccuValue(Value: 26, Unit: "mi/h"))), UVIndex: 4, Visibility: ImperialInfo(Imperial: AccuValue(Value: 10, Unit: "in")), Pressure: ImperialInfo(Imperial: AccuValue(Value: 29.81, Unit: "inHg")), ApparentTemperature: ImperialInfo(Imperial: AccuValue(Value: 64.0, Unit: "F")), WindChillTemperature: ImperialInfo(Imperial: AccuValue(Value: 55.5, Unit: "F")))
+
+        let forecast = ForecastData(DailyForecasts: [DailyData(Date: "", EpochDate: 789798, Temperature: ForecastTemperatureInfo(Minimum: AccuValue(Value: 50, Unit: "F"), Maximum: AccuValue(Value: 88, Unit: "F")), Day: ConditionsInfo(Icon: 6, IconPhrase: ""))])
+        
+        self.weatherData = WeatherData()
+        self.weatherData.current = current
+        self.weatherData.forecast = forecast
     }
 }
 

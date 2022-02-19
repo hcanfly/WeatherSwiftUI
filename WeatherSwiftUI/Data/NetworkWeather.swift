@@ -15,7 +15,7 @@ import Combine
 enum NetworkError: Error, LocalizedError {
     case invalidHTTPResponse, invalidServerResponse, jsonParsingError, apiError(reason: String)
 
-    var errorDescription: String? {
+    var errorDescription: String {
         switch self {
         case .invalidHTTPResponse:
             return "Invalid HTTP response"

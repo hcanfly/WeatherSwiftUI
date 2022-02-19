@@ -10,20 +10,16 @@ import SwiftUI
 
 
 struct WindAndPressurePanelView: View {
-    @ObservedObject var viewModel: ViewModel
+    let weatherData: WeatherData
 
     private var bladeAnimation: Animation? {
         // duration / repeatForever is seriously broken. this animation will never change even though it gets called with new model values
         // so, this should work because it gets called when model changes - but it doesn't work
         // and setting the duration to a default number instead of returning nil animation was tried first. didn't work either.
         // also tried making this a function call instead of a var.
-        // I'm not the first to find this bug.
-        //print(viewModel.bladeDuration)
-        //return viewModel.bladeDuration != nil ? Animation.linear(duration: viewModel.bladeDuration!).repeatForever(autoreverses: false) : nil
-        // use a default speed to have blade rotate. looks more interesting than not rotating.
-        //print(viewModel.current.Wind.Speed)
-        //return Animation.linear(duration: viewModel.bladeDuration ?? 12).repeatForever(autoreverses: false)
-        return Animation.linear(duration: viewModel.bladeDuration).repeatCount(99999, autoreverses: false)
+        // I'm not the first to find this bug. Been checking on this for a couple of years now.
+
+        return Animation.linear(duration: weatherData.bladeDuration).repeatForever(autoreverses: false)
     }
 
     // Another problem that I believe is related to the above is that when the device is rotated the blades just kind of start floating around
@@ -66,13 +62,13 @@ struct WindAndPressurePanelView: View {
                     VStack(alignment: .leading) {
                         Text("Wind")
                          .scaledPanelFont()
-                        Text(viewModel.windSpeedInfo)
+                        Text(weatherData.windSpeedInfo)
                          .scaledPanelFont()
                     }.offset(y: -60)
                     VStack(alignment: .center) {
                         Text("Barometer")
                          .scaledPanelFont()
-                        Text(viewModel.pressure)
+                        Text(weatherData.pressure)
                          .scaledPanelFont()
                     }.frame(width: 100)
                     .padding(.leading, 30)
@@ -83,15 +79,5 @@ struct WindAndPressurePanelView: View {
     }
 }
 
-
-struct WindAndPressureView_Previews: PreviewProvider {
-    static var previews: some View {
-        ZStack {
-            Color.blue
-            WindAndPressurePanelView(viewModel: ViewModel())
-        }
-        .frame(width: 400, height: 120)
-    }
-}
 
 

@@ -13,15 +13,15 @@ fileprivate let currentWeatherViewFontSize: CGFloat = 24
 
 
 struct CurrentWeatherView: View {
-    @ObservedObject var viewModel: ViewModel
+    let weatherData: WeatherData
 
     var body: some View {
         VStack(alignment: .leading) {
             Group {
                 HStack {
-                    Image(viewModel.weatherIconName)
+                    Image(weatherData.weatherIconName)
                         .frame(width: 75, height: 45, alignment: .leading)
-                    Text(viewModel.currentConditions)
+                    Text(weatherData.currentConditions)
                         .scaledCurrentWeatherPanelFont()
                         .padding(.top, 5)
                 }
@@ -31,7 +31,7 @@ struct CurrentWeatherView: View {
                         .frame(width: 13, height: 17)
                         .aspectRatio(contentMode: .fit)
                         .padding(.trailing, 8)
-                    Text(viewModel.highTemp + degreesChar)
+                    Text(weatherData.highTemp + degreesChar)
                         .scaledCurrentWeatherPanelFont()
                         .padding(.trailing, currentWeatherViewFontSize)
                     Image("LowTemp")
@@ -39,13 +39,13 @@ struct CurrentWeatherView: View {
                         .frame(width: 13, height: 17)
                         .aspectRatio(contentMode: .fit)
                         .padding(.trailing, 8)
-                    Text(viewModel.lowTemp + degreesChar)
+                    Text(weatherData.lowTemp + degreesChar)
                         .scaledCurrentWeatherPanelFont()
                         .padding(.trailing, currentWeatherViewFontSize)
                     Spacer()
                 }
                 HStack {
-                    Text(viewModel.temperature + degreesChar)
+                    Text(weatherData.temperature + degreesChar)
                     .scaledFont(name: "HelveticaNeue-UltraLight", size: 72)
                 }
             }.foregroundColor(.white)
@@ -54,7 +54,6 @@ struct CurrentWeatherView: View {
 }
 
 struct ScaledFont: ViewModifier {
-    @Environment(\.sizeCategory) var sizeCategory
     var name: String
     var size: CGFloat
 
@@ -74,10 +73,3 @@ extension View {
     }
 }
 
-
-struct CurrentWeatherView_Previews: PreviewProvider {
-    static var previews: some View {
-        CurrentWeatherView(viewModel: ViewModel())
-            .background(Color.blue)
-    }
-}

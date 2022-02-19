@@ -12,7 +12,7 @@ let panelViewFontSize: CGFloat = 16
 let panelBackgroundColor = Color(UIColor(hex: 0x000049, alpha: 0.1))
 
 struct DetailsPanelView: View {
-    @ObservedObject var viewModel: ViewModel
+    let weatherData: WeatherData
     private let screenWidth = UIScreen.main.bounds.width
 
 
@@ -22,7 +22,7 @@ struct DetailsPanelView: View {
                 PanelHeaderView(title: "Details")
                     .padding(.leading, screenWidth > 500 ? 0 : 14)
                 HStack {
-                    Image(viewModel.weatherIconName)
+                    Image(weatherData.weatherIconName)
                         .font(.system(size: 60.0))
                         .padding(.leading, 70)
                         .padding(.trailing, 80)
@@ -35,7 +35,7 @@ struct DetailsPanelView: View {
                                 .scaledPanelFont()
                                 .alignmentGuide(HorizontalAlignment.center, computeValue: { _ in -190 } )
                             Spacer()
-                            Text(viewModel.feelsLike)
+                            Text(weatherData.feelsLike)
                                 .scaledPanelFont()
                         }
                         Divider()
@@ -43,7 +43,7 @@ struct DetailsPanelView: View {
                             Text("Humidity")
                                 .scaledPanelFont()
                             Spacer()
-                            Text(viewModel.humidity)
+                            Text(weatherData.humidity)
                                 .scaledPanelFont()
                         }
                         Divider()
@@ -51,7 +51,7 @@ struct DetailsPanelView: View {
                             Text("Visibility")
                                 .scaledPanelFont()
                             Spacer()
-                            Text(viewModel.visibility)
+                            Text(weatherData.visibility)
                                 .scaledPanelFont()
                         }
                         Divider()
@@ -61,7 +61,7 @@ struct DetailsPanelView: View {
                             Spacer()
                             RoundedRectangle(cornerRadius: 8, style: .circular)
                                 .frame(width: 30, height: 10)
-                                .foregroundColor(viewModel.uvIndexColor)
+                                .foregroundColor(weatherData.uvIndexColor)
                         }.padding(.bottom, 0)
                     }.padding(.trailing, screenWidth > 500 ? 20 : 36)
                     .frame(width: 180)
@@ -101,13 +101,5 @@ extension UIColor {
             green: CGFloat((hex & 0x00FF00) >> 8) / 255.0,
             blue: CGFloat(hex & 0x0000FF) / 255.0,
             alpha: alpha )
-    }
-}
-
-struct DetailsView_Previews: PreviewProvider {
-    static var previews: some View {
-        DetailsPanelView(viewModel: ViewModel())
-            .background(Color.blue)
-            .frame(width: 400, height: 120)
     }
 }
