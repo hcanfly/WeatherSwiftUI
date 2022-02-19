@@ -7,16 +7,15 @@
 //
 
 import Foundation
-import Combine
-
-
 
 
 enum NetworkError: Error, LocalizedError {
-    case invalidHTTPResponse, invalidServerResponse, jsonParsingError, apiError(reason: String)
+    case invalidURL, invalidHTTPResponse, invalidServerResponse, jsonParsingError, apiError(reason: String)
 
     var errorDescription: String {
         switch self {
+        case .invalidURL:
+            return "Did you enter your AccuWeather API Key in ViewModel+Network.swift?"
         case .invalidHTTPResponse:
             return "Invalid HTTP response"
         case .invalidServerResponse:
@@ -32,31 +31,51 @@ enum NetworkError: Error, LocalizedError {
 
 enum DataFetcher {
 
-    static func fetch<T: Decodable>(url: URL?, myType: T.Type) -> AnyPublisher<T, NetworkError> {
+    static func fetch<T: Decodable>(url: URL?, myType: T.Type) async throws -> T {
         guard let url = url else {
-            fatalError("Did you enter your AccuWeather API Key?")
-        }
+            throw NetworkError.invalidURL
+          }
+        
+        let session = URLSession.shared
 
-        return URLSession.shared.dataTaskPublisher(for: url)
-            .tryMap { data, response -> T in
-                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                    throw NetworkError.invalidHTTPResponse
-                }
-                //print(String(bytes: data, encoding: String.Encoding.utf8))
-                let value = try JSONDecoder().decode(T.self, from: data)
-                return value
+        let (data, response) = try await session.data(from: url)
+        guard let httpResponse = response as? HTTPURLResponse, 200..<300 ~= httpResponse.statusCode else {
+            throw NetworkError.invalidServerResponse
         }
-        .mapError { error in
-            if let _ = error as? DecodingError {
-                return NetworkError.jsonParsingError
-            } else if let error = error as? NetworkError {
-                return error
-            }
+        
+        //print(String(bytes: data, encoding: String.Encoding.utf8))
+        let decoder = JSONDecoder()
+        let theData = try decoder.decode(T.self, from: data)
 
-            // handle service errors (e.g. not being able to connect)
-            return NetworkError.invalidServerResponse
-        }
-        .eraseToAnyPublisher()
+        return theData
     }
+    
+    // *** Combine
+//    static func fetch<T: Decodable>(url: URL?, myType: T.Type) -> AnyPublisher<T, NetworkError> {
+//        guard let url = url else {
+//            fatalError("Did you enter your AccuWeather API Key?")
+//        }
+//
+//        return URLSession.shared.dataTaskPublisher(for: url)
+//            .tryMap { data, response -> T in
+//                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+//                    throw NetworkError.invalidHTTPResponse
+//                }
+//                //print(String(bytes: data, encoding: String.Encoding.utf8))
+//                let value = try JSONDecoder().decode(T.self, from: data)
+//                return value
+//        }
+//        .mapError { error in
+//            if let _ = error as? DecodingError {
+//                return NetworkError.jsonParsingError
+//            } else if let error = error as? NetworkError {
+//                return error
+//            }
+//
+//            // handle service errors (e.g. not being able to connect)
+//            return NetworkError.invalidServerResponse
+//        }
+//        .eraseToAnyPublisher()
+//    }
 
 }

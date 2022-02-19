@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Combine
 
 
 /*
@@ -18,7 +17,7 @@ import Combine
 
 
 let locationCode = "337169"         // Mountain View, CA
-let accuWeatherapikey = "<your AccuWeather api key>"  // MUST CHANGE API KEY!!
+let accuWeatherapikey = "<your AccuWeather api key>"  // <your AccuWeather api key>
 
 extension URL {
 
@@ -37,53 +36,81 @@ extension URL {
 }
 
 extension ViewModel {
-
+    
+    // can't make func async because initial view gets disposed before func finishes and calls get cancelled.
+    // and we really just want async, not await anyhow. don't want to wait for a response. state will be updated when we get a response.
     func getWeather() {
         
         self.state = .loading
-        let currentWeatherPublisher = DataFetcher.fetch(url: URL.weather, myType: [CurrentData].self)
-        let forecastWeatherPublisher = DataFetcher.fetch(url: URL.forecastWeather, myType: ForecastData.self)
         
-        // wait until both fetches finish before updating the data and forcing the UI to refresh
-        let _ = Publishers.Zip(currentWeatherPublisher, forecastWeatherPublisher)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    break
-                case .failure(let theError):
-                    self.handleDownloadError(error: theError)
-                    self.state = .failed(theError)
-                }
-            }, receiveValue: { (current, forecast) in
-                if current.count > 0 {
-                    self.weatherData.current = current.first!
-                    self.weatherData.forecast = forecast
+        Task {
+            do {
+                let currentWeather = try await DataFetcher.fetch(url: URL.weather, myType: [CurrentData].self)
+                let forecastWeather = try await DataFetcher.fetch(url: URL.forecastWeather, myType: ForecastData.self)
+                
+                self.weatherData.forecast = forecastWeather
+                self.weatherData.current = currentWeather.first!
+                DispatchQueue.main.async {
                     self.state = .loaded(self.weatherData)
-                } else {
-                    self.handleDownloadError(error: .invalidServerResponse)
-                    self.state = .failed(.invalidServerResponse)
                 }
+                
+            } catch (let error) {
+                print(error.localizedDescription)
+                self.state = .failed(error as! NetworkError)
             }
-            )
-            .store(in: &disposables)
-    }
-
-    // in real life you might want a bit more than this...
-    func handleDownloadError(error: NetworkError) {
-        switch error {
-        case NetworkError.invalidHTTPResponse:
-            //print(error.errorDescription)
-            break
-        case NetworkError.invalidServerResponse:
-            //print(error.errorDescription)
-            break
-        case NetworkError.jsonParsingError:
-            //print(error.errorDescription)
-            break
-        default:
-            break
         }
+        
     }
-
 }
+// Combine
+//extension ViewModel {
+//
+//    func getWeather() {
+//
+//        self.state = .loading
+//        let currentWeatherPublisher = DataFetcher.fetch(url: URL.weather, myType: [CurrentData].self)
+//        let forecastWeatherPublisher = DataFetcher.fetch(url: URL.forecastWeather, myType: ForecastData.self)
+//
+//        // wait until both fetches finish before updating the data and forcing the UI to refresh
+//        let _ = Publishers.Zip(currentWeatherPublisher, forecastWeatherPublisher)
+//            .receive(on: DispatchQueue.main)
+//            .sink(receiveCompletion: { completion in
+//                switch completion {
+//                case .finished:
+//                    break
+//                case .failure(let theError):
+//                    self.handleDownloadError(error: theError)
+//                    self.state = .failed(theError)
+//                }
+//            }, receiveValue: { (current, forecast) in
+//                if current.count > 0 {
+//                    self.weatherData.current = current.first!
+//                    self.weatherData.forecast = forecast
+//                    self.state = .loaded(self.weatherData)
+//                } else {
+//                    self.handleDownloadError(error: .invalidServerResponse)
+//                    self.state = .failed(.invalidServerResponse)
+//                }
+//            }
+//            )
+//            .store(in: &disposables)
+//    }
+//
+//    // in real life you might want a bit more than this...
+//    func handleDownloadError(error: NetworkError) {
+//        switch error {
+//        case NetworkError.invalidHTTPResponse:
+//            //print(error.errorDescription)
+//            break
+//        case NetworkError.invalidServerResponse:
+//            //print(error.errorDescription)
+//            break
+//        case NetworkError.jsonParsingError:
+//            //print(error.errorDescription)
+//            break
+//        default:
+//            break
+//        }
+//    }
+//
+//}

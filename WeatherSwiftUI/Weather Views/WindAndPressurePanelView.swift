@@ -11,14 +11,10 @@ import SwiftUI
 
 struct WindAndPressurePanelView: View {
     let weatherData: WeatherData
+    @State private var rotateLargeFan = true
+     @State private var rotateSmallFan = true
 
     private var bladeAnimation: Animation? {
-        // duration / repeatForever is seriously broken. this animation will never change even though it gets called with new model values
-        // so, this should work because it gets called when model changes - but it doesn't work
-        // and setting the duration to a default number instead of returning nil animation was tried first. didn't work either.
-        // also tried making this a function call instead of a var.
-        // I'm not the first to find this bug. Been checking on this for a couple of years now.
-
         return Animation.linear(duration: weatherData.bladeDuration).repeatForever(autoreverses: false)
     }
 
@@ -26,9 +22,6 @@ struct WindAndPressurePanelView: View {
     // they act as if their yoffset is fairly random. I removed the yoffset modifier and tried to position differenty and this didn't make any difference
     // Everything else about layout on device rotation seems to be fine. Don't allow rotation until this gets fixed.
 
-
-    @State private var rotateLargeFan = true
-    @State private var rotateSmallFan = true
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -42,6 +35,10 @@ struct WindAndPressurePanelView: View {
                         Image("blade_big")
                             .rotationEffect(.degrees(rotateLargeFan ? 360*4 : 0))
                             .offset(y: -35)
+                            // yet another really stupid SwiftUI .animate bug. Setting the animation value to rotateLargeFan won't
+                            // cause the animation to draw. small blade animation below uses it to illustrate. But obviously not necessary.
+                            // its use in .rotationEffect above causes the refresh
+                            // but, hey I did get it to rotate, if not the way it's supposed to work
                             .animation(self.bladeAnimation)
                             .onAppear() {
                                 self.rotateLargeFan.toggle()
@@ -53,7 +50,7 @@ struct WindAndPressurePanelView: View {
                             Image("blade_small")
                                 .rotationEffect(.degrees(rotateSmallFan ? 360*4 : 0))
                                 .offset(y: -25)
-                                .animation(self.bladeAnimation)
+                                .animation(.easeIn(duration: weatherData.bladeDuration).repeatForever(autoreverses: false), value: rotateSmallFan)
                                 .onAppear() {
                                     self.rotateSmallFan.toggle()
                                 }
@@ -79,5 +76,33 @@ struct WindAndPressurePanelView: View {
     }
 }
 
-
-
+// made an equatable imageview, which is supposed to make .animate update properly. doesn't
+// equality test gets hit, but return value doesn't matter. still won't draw.
+//struct BladeImageView: View, Equatable {
+//    let imageName: String
+//    let duration: Double
+//
+//    var body: some View {
+//        Image(imageName)
+//            .rotationEffect(.degrees(360*4))
+//            .offset(y: -25)
+//    }
+//
+//    static func == (lhs: Self, rhs: Self) -> Bool {
+//        return false
+//    }
+//}
+//
+//struct BladeImageViewContainerView: View, Equatable {
+//    let imageName: String
+//    let duration: Double
+//
+//    var body: some View {
+//        BladeImageView(imageName: imageName, duration: duration)
+//            .animation(.linear(duration: duration).repeatForever(autoreverses: false))
+//    }
+//
+//    static func == (lhs: Self, rhs: Self) -> Bool {
+//        return false
+//    }
+//}
